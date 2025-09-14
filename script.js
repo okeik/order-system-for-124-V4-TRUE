@@ -560,10 +560,24 @@ document.addEventListener('DOMContentLoaded', function() {
         const savedOrders = localStorage.getItem("orders");
         if (savedOrders) {
             ordersData = JSON.parse(savedOrders);
+            console.log("成功載入保存的訂單:", ordersData);
+        } else {
+            console.log("沒有找到保存的訂單數據");
+            ordersData = {};
         }
     } catch (e) {
         ordersData = {};
-        console.log("載入保存的訂單失敗：", e);
+        console.error("載入保存的訂單失敗：", e);
+    }
+    
+    // 檢查localStorage是否可用
+    try {
+        localStorage.setItem('test', 'test');
+        localStorage.removeItem('test');
+        console.log("localStorage 可用");
+    } catch (e) {
+        console.error("localStorage 不可用:", e);
+        showStatus("注意：瀏覽器儲存功能受限，訂單可能無法長期保存", 'error');
     }
     
     // 綁定事件
@@ -651,4 +665,25 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     console.log("訂餐系統初始化完成");
+    
+    // 在管理員區域添加調試按鈕（開發時使用）
+    if (window.location.hostname === 'localhost' || window.location.hostname.includes('github.io')) {
+        addDebugButton();
+    }
 });
+
+// 添加調試功能
+function addDebugButton() {
+    const adminSection = document.querySelector('.admin-section');
+    if (adminSection) {
+        const debugBtn = document.createElement('button');
+        debugBtn.textContent = '調試：顯示內存訂單';
+        debugBtn.style.cssText = 'margin: 10px 0; padding: 8px 16px; background: #ffc107; border: none; border-radius: 4px; cursor: pointer;';
+        debugBtn.onclick = function() {
+            console.log('內存中的訂單數據:', ordersData);
+            console.log('localStorage中的訂單數據:', localStorage.getItem('orders'));
+            alert('訂單數據已輸出到控制台，按F12查看');
+        };
+        adminSection.appendChild(debugBtn);
+    }
+}
